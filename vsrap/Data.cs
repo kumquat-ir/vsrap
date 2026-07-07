@@ -1,0 +1,108 @@
+// This file is generated, do not edit!
+// Instead see templates/Data.template.cs, <apworld>/logic/items.lisp, and <apworld>/logic/locations.lisp
+
+using System.Collections.Generic;
+
+namespace vsrap;
+
+public class Data {
+    public static Dictionary<long, Decryptor.ID> DECRYPTOR_ITEMS = new() {
+        [100] = Decryptor.ID.CHARGE_SHOT,
+        [101] = Decryptor.ID.CHARGE_MAGNET,
+        [102] = Decryptor.ID.ALTERED_SHOT,
+        [103] = Decryptor.ID.CHARGE_GRIP,
+        [104] = Decryptor.ID.WALL_RUN,
+        [105] = Decryptor.ID.SPIN_DODGE,
+        [106] = Decryptor.ID.HEAT_RESIST,
+        [107] = Decryptor.ID.MENTAL_RECOVERY,
+        [108] = Decryptor.ID.ENERGY_CLAW,
+        [109] = Decryptor.ID.STRIP_SUIT,
+        [110] = Decryptor.ID.NO_OBJECTIONS,
+        [111] = Decryptor.ID.SPEED_BOOST,
+        [112] = Decryptor.ID.CLAW_BREAKS_CHARGE_SHOT,
+        [113] = Decryptor.ID.SPEED_BOOST_BREAKS_CLAW,
+        [114] = Decryptor.ID.SHOW_IMPORTANT,
+        [115] = Decryptor.ID.VIRUS,
+        [116] = Decryptor.ID.VIRUS_WIPE,
+        [117] = Decryptor.ID.DOUBLE_SHOT,
+        [118] = Decryptor.ID.SPIN_DOUBLE,
+        [119] = Decryptor.ID.SPIN_DODGE_JUMP,
+        [120] = Decryptor.ID.CHAMBER_FOCUS,
+        [121] = Decryptor.ID.SPEED_BOOST_EARLIER,
+    };
+
+    public static Dictionary<Decryptor.ID, long> DECRYPTOR_LOCATIONS = new() {
+        [Decryptor.ID.CHARGE_SHOT] = 100,
+        [Decryptor.ID.CHARGE_MAGNET] = 101,
+        [Decryptor.ID.ALTERED_SHOT] = 102,
+        [Decryptor.ID.CHARGE_GRIP] = 103,
+        [Decryptor.ID.WALL_RUN] = 104,
+        [Decryptor.ID.SPIN_DODGE] = 105,
+        [Decryptor.ID.HEAT_RESIST] = 106,
+        [Decryptor.ID.MENTAL_RECOVERY] = 107,
+        [Decryptor.ID.ENERGY_CLAW] = 108,
+        [Decryptor.ID.STRIP_SUIT] = 109,
+        [Decryptor.ID.NO_OBJECTIONS] = 110,
+        [Decryptor.ID.SPEED_BOOST] = 111,
+        [Decryptor.ID.CLAW_BREAKS_CHARGE_SHOT] = 112,
+        [Decryptor.ID.SPEED_BOOST_BREAKS_CLAW] = 113,
+        [Decryptor.ID.SHOW_IMPORTANT] = 114,
+        [Decryptor.ID.VIRUS] = 115,
+        [Decryptor.ID.VIRUS_WIPE] = 116,
+        [Decryptor.ID.DOUBLE_SHOT] = 117,
+    };
+
+    public static Dictionary<long, int> CARD_ITEMS = new() {
+        [201] = 1,
+        [202] = 2,
+        [203] = 3,
+        [204] = 4,
+        [205] = 5,
+        [206] = 6,
+        [207] = 7,
+        [208] = 8,
+        [209] = 9,
+        [210] = 10,
+        [211] = 12,
+        [212] = 13,
+        [213] = 14,
+        [214] = 15,
+        [215] = 16,
+        [216] = 17,
+        [217] = 18,
+        [218] = 19,
+        [219] = 20,
+        [220] = 21,
+        [221] = 22,
+        [222] = 23,
+        [223] = 24,
+        [224] = 25,
+    };
+
+    public static Dictionary<long, int> CARD_LOCATIONS = new() {
+        [1] = 201,
+        [2] = 202,
+        [3] = 203,
+        [4] = 204,
+        [5] = 205,
+        [6] = 206,
+        [7] = 207,
+        [8] = 208,
+        [9] = 209,
+        [10] = 210,
+        [12] = 211,
+        [13] = 212,
+        [14] = 213,
+        [15] = 214,
+        [16] = 215,
+        [17] = 216,
+        [18] = 217,
+        [19] = 218,
+        [20] = 219,
+        [21] = 220,
+        [22] = 221,
+        [23] = 222,
+        [24] = 223,
+        [25] = 224,
+    };
+}
