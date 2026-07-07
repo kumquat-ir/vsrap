@@ -29,4 +29,34 @@ public class Data {
         [{{ card }}] = {{ id }},
     {%- endfor %}
     };
+
+    public static Dictionary<long, float> PHASE_REFILLS = new() {
+    {%- for id, amount in phase_amounts.items() %}
+        [{{ id }}] = {{ amount }}f,
+    {%- endfor %}
+    };
+
+    public static Dictionary<(int, int), long> AMBUSH_LOCATIONS = new() {
+    {%- for pos, id in ambush_locations.items() %}
+        [({{ pos[0] }}, {{ pos[1] }})] = {{ id }},
+    {%- endfor %}
+    };
+
+    public static Dictionary<PhysicalUpgrade.HealthUpgrade, long> HEALTH_UPGRADE_LOCATIONS = new() {
+    {%- for upgrade, id in health_locations.items() %}
+        [PhysicalUpgrade.HealthUpgrade.{{ upgrade }}] = {{ id }},
+    {%- endfor %}
+    };
+
+    public static Dictionary<PhysicalUpgrade.PhaseUpgrade, long> PHASE_UPGRADE_LOCATIONS = new() {
+    {%- for upgrade, id in phase_locations.items() %}
+        [PhysicalUpgrade.PhaseUpgrade.{{ upgrade }}] = {{ id }},
+    {%- endfor %}
+    };
+
+    public static Dictionary<PhysicalUpgrade.Orb, long> ORB_LOCATIONS = new() {
+    {%- for orb, id in orb_locations.items() %}
+        [PhysicalUpgrade.Orb.{{ orb }}] = {{ id }},
+    {%- endfor %}
+    };
 }

@@ -68,7 +68,7 @@ public class APSession {
                                                session.Locations.AllLocations.Contains(id) &&
                                                session.Locations.AllMissingLocations.Contains(id));
         if (locationsNotOnServer.Any()) {
-            Notifications.queueNotification($"Sending {locationsNotOnServer.Count()} missed locations...");
+            Notifications.queueNotification($"Sending {locationsNotOnServer.Count()} missed location(s)...");
             session.Locations.CompleteLocationChecks(locationsNotOnServer.ToArray());
         }
 
@@ -86,6 +86,9 @@ public class APSession {
 
         uncollectedLocationInfo = null;
         session.Socket.DisconnectAsync();
+        session.Socket.ErrorReceived -= logReceivedError;
+        session.Items.ItemReceived -= itemReceived;
+        session.Locations.CheckedLocationsUpdated -= locationsChecked;
         session = null;
     }
 
@@ -118,7 +121,7 @@ public class APSession {
     }
 
     public static void locationsChecked(ReadOnlyCollection<long> newLocations) {
-        VSRAP.logger.LogInfo($"{newLocations.Count} locations collected: {String.Join(" ", newLocations)}");
+        VSRAP.logger.LogInfo($"{newLocations.Count} location(s) collected: {String.Join(" ", newLocations)}");
         foreach (long id in newLocations) {
             CheckHandler.externalCollectLocation(id);
         }

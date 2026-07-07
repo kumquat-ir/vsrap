@@ -79,7 +79,7 @@ public class Data {
         [224] = 25,
     };
 
-    public static Dictionary<long, int> CARD_LOCATIONS = new() {
+    public static Dictionary<int, long> CARD_LOCATIONS = new() {
         [1] = 201,
         [2] = 202,
         [3] = 203,
@@ -104,5 +104,46 @@ public class Data {
         [23] = 222,
         [24] = 223,
         [25] = 224,
+    };
+
+    public static Dictionary<long, float> PHASE_REFILLS = new() {
+        [1] = 25f,
+        [2] = 50f,
+        [3] = 75f,
+        [4] = 100f,
+    };
+
+    public static Dictionary<(int, int), long> AMBUSH_LOCATIONS = new() {
+        [(15, 21)] = 300,
+        [(21, 20)] = 301,
+        [(10, 16)] = 302,
+        [(6, 18)] = 303,
+        [(24, 14)] = 304,
+        [(17, 14)] = 305,
+        [(14, 11)] = 306,
+        [(5, 8)] = 307,
+        [(12, 9)] = 308,
+        [(12, 27)] = 309,
+    };
+
+    public static Dictionary<PhysicalUpgrade.HealthUpgrade, long> HEALTH_UPGRADE_LOCATIONS = new() {
+        [PhysicalUpgrade.HealthUpgrade.HU0] = 400,
+        [PhysicalUpgrade.HealthUpgrade.HU1] = 401,
+        [PhysicalUpgrade.HealthUpgrade.HU2] = 402,
+        [PhysicalUpgrade.HealthUpgrade.HU3] = 403,
+    };
+
+    public static Dictionary<PhysicalUpgrade.PhaseUpgrade, long> PHASE_UPGRADE_LOCATIONS = new() {
+        [PhysicalUpgrade.PhaseUpgrade.PU0] = 404,
+        [PhysicalUpgrade.PhaseUpgrade.PU1] = 405,
+        [PhysicalUpgrade.PhaseUpgrade.PU2] = 406,
+        [PhysicalUpgrade.PhaseUpgrade.PU3] = 407,
+    };
+
+    public static Dictionary<PhysicalUpgrade.Orb, long> ORB_LOCATIONS = new() {
+        [PhysicalUpgrade.Orb.ORB0] = 408,
+        [PhysicalUpgrade.Orb.ORB1] = 409,
+        [PhysicalUpgrade.Orb.ORB2] = 410,
+        [PhysicalUpgrade.Orb.ORB3] = 411,
     };
 }

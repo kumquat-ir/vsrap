@@ -17,6 +17,15 @@ public class CheckHandler {
         else if (Data.CARD_ITEMS.ContainsKey(id)) {
             Vars.creatureCardFind(Data.CARD_ITEMS[id]);
         }
+        else if (Data.PHASE_REFILLS.ContainsKey(id)) {
+            if (Player.instance != null) {
+                // TODO fix getting multiple of these
+                Player.instance.phasePickup(Data.PHASE_REFILLS[id]);
+            }
+        }
+        else {
+            VSRAP.logger.LogWarning($"Recieved unknown item {id}!");
+        }
     }
 
     private static void sendCheck(long check) {
@@ -48,6 +57,47 @@ public class CheckHandler {
             return;
         }
         sendCheck(Data.CARD_LOCATIONS[card]);
+    }
+
+    [HarmonyPatch(typeof(NodeData), nameof(NodeData.defeatAmbush), new Type[] { typeof(int), typeof(int) })]
+    [HarmonyPostfix]
+    public static void clearAmbush(int gridX, int gridY) {
+        (int, int) pos = (gridX, gridY);
+        if (!Data.AMBUSH_LOCATIONS.ContainsKey(pos)) {
+            VSRAP.logger.LogError($"No location ID for ambush at {pos}!");
+            return;
+        }
+        sendCheck(Data.AMBUSH_LOCATIONS[pos]);
+    }
+
+    [HarmonyPatch(typeof(NodeData), nameof(NodeData.healthUpgradeCollect))]
+    [HarmonyPostfix]
+    public static void collectHealthUpgrade(PhysicalUpgrade.HealthUpgrade healthUpgrade) {
+        if (!Data.HEALTH_UPGRADE_LOCATIONS.ContainsKey(healthUpgrade)) {
+            VSRAP.logger.LogError($"No location ID for health upgrade {healthUpgrade}!");
+            return;
+        }
+        sendCheck(Data.HEALTH_UPGRADE_LOCATIONS[healthUpgrade]);
+    }
+
+    [HarmonyPatch(typeof(NodeData), nameof(NodeData.phaseUpgradeCollect))]
+    [HarmonyPostfix]
+    public static void collectPhaseUpgrade(PhysicalUpgrade.PhaseUpgrade phaseUpgrade) {
+        if (!Data.PHASE_UPGRADE_LOCATIONS.ContainsKey(phaseUpgrade)) {
+            VSRAP.logger.LogError($"No location ID for phase upgrade {phaseUpgrade}!");
+            return;
+        }
+        sendCheck(Data.PHASE_UPGRADE_LOCATIONS[phaseUpgrade]);
+    }
+
+    [HarmonyPatch(typeof(NodeData), nameof(NodeData.orbCollect))]
+    [HarmonyPostfix]
+    public static void collectOrb(PhysicalUpgrade.Orb orb) {
+        if (!Data.ORB_LOCATIONS.ContainsKey(orb)) {
+            VSRAP.logger.LogError($"No location ID for orb {orb}!");
+            return;
+        }
+        sendCheck(Data.ORB_LOCATIONS[orb]);
     }
 
     public static void externalCollectLocation(long id) {
