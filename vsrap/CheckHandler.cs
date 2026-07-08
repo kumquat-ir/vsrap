@@ -18,8 +18,15 @@ public class CheckHandler {
             Vars.creatureCardFind(Data.CARD_ITEMS[id]);
         }
         else if (Data.PHASE_REFILLS.ContainsKey(id)) {
+            if (!APSession.currentSave.recievedMultiples.ContainsKey(id)) {
+                APSession.currentSave.recievedMultiples[id] = 0;
+            }
+            if (!APSession.sessionRecievedMultiples.ContainsKey(id)) {
+                APSession.sessionRecievedMultiples[id] = 1;
+            }
+            APSession.currentSave.recievedMultiples[id]++;
+
             if (Player.instance != null) {
-                // TODO fix getting multiple of these
                 Player.instance.phasePickup(Data.PHASE_REFILLS[id]);
             }
         }
@@ -31,7 +38,6 @@ public class CheckHandler {
     private static void sendCheck(long check) {
         if (!APSession.currentSave.checkedLocations.Contains(check) && APSession.session.Locations.AllLocations.Contains(check)) {
             APSession.currentSave.checkedLocations.Add(check);
-            // TODO make sure this doesnt die when we are disconnected
             APSession.session.Locations.CompleteLocationChecks(check);
 
             if (APSession.uncollectedLocationInfo != null) {

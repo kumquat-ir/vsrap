@@ -16,8 +16,9 @@ public class APConnectionData {
 
 public class APSaveData {
     public APConnectionData connection = new();
-    public ISet<long> checkedLocations = new HashSet<long>();
-    public ISet<long> receivedItems = new HashSet<long>();
+    public HashSet<long> checkedLocations = new();
+    public HashSet<long> receivedItems = new();
+    public Dictionary<long, int> recievedMultiples = new();
 }
 
 [HarmonyPatch]
@@ -100,13 +101,14 @@ public class SaveDataPatches {
         builder.AppendLine($"{conn.address},{conn.port},{conn.slot},{conn.password}");
         builder.AppendLine(String.Join(",", save.checkedLocations));
         builder.AppendLine(String.Join(",", save.receivedItems));
+        builder.AppendLine(String.Join(",", save.recievedMultiples.Select(entry => $"{entry.Key}:{entry.Value}")));
 
         return builder;
     }
 
     static void readLoadedData(string[] data) {
         int baseIndex = 22;
-        if (data.Length <= baseIndex + 3 || data[baseIndex] != sentinel) {
+        if (data.Length <= baseIndex + 4 || data[baseIndex] != sentinel) {
             loadError = "Cannot load vanilla saves!";
             return;
         }
@@ -119,8 +121,19 @@ public class SaveDataPatches {
         save.connection.slot = connectionInfo[2];
         save.connection.password = connectionInfo[3];
 
-        save.checkedLocations = new HashSet<long>(data[baseIndex + 2].Split(',').Where(id => !String.IsNullOrWhiteSpace(id)).Select(id => long.Parse(id)));
-        save.receivedItems = new HashSet<long>(data[baseIndex + 3].Split(',').Where(id => !String.IsNullOrWhiteSpace(id)).Select(id => long.Parse(id)));
+        save.checkedLocations = new HashSet<long>(data[baseIndex + 2]
+                                                  .Split(',')
+                                                  .Where(id => !String.IsNullOrWhiteSpace(id))
+                                                  .Select(id => long.Parse(id)));
+        save.receivedItems = new HashSet<long>(data[baseIndex + 3]
+                                               .Split(',')
+                                               .Where(id => !String.IsNullOrWhiteSpace(id))
+                                               .Select(id => long.Parse(id)));
+        save.recievedMultiples = data[baseIndex + 4]
+            .Split(',')
+            .Where(id => !String.IsNullOrWhiteSpace(id))
+            .Select(str => str.Split(':'))
+            .ToDictionary(s => long.Parse(s[0]), s => int.Parse(s[1]));
 
         APSession.currentSave = save;
         APSession.connect();

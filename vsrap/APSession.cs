@@ -13,6 +13,7 @@ public class APSession {
     public static ArchipelagoSession session = null;
     public static APSaveData currentSave = null;
     public static Dictionary<long, ScoutedItemInfo> uncollectedLocationInfo = null;
+    public static Dictionary<long, int> sessionRecievedMultiples = new();
 
     public static void connect() {
         if (session != null) {
@@ -21,6 +22,7 @@ public class APSession {
         }
 
         VSRAP.logger.LogInfo($"Connecting to {currentSave.connection.address} port {currentSave.connection.port} as {currentSave.connection.slot}");
+        Notifications.clearQueue(); // there may be some error notifs piled up from earlier failed connections
 
         session = ArchipelagoSessionFactory.CreateSession(currentSave.connection.address, currentSave.connection.port);
         session.Socket.ErrorReceived += logReceivedError;
@@ -60,7 +62,6 @@ public class APSession {
 
         VSRAP.logger.LogInfo("Connected!");
 
-        Notifications.clearQueue(); // there may be some error notifs piled up from earlier failed connections
         Notifications.queueNotification($"Connected to {currentSave.connection.address}!");
 
         IEnumerable<long> locationsNotOnServer =
@@ -85,6 +86,7 @@ public class APSession {
         }
 
         uncollectedLocationInfo = null;
+        sessionRecievedMultiples.Clear();
         session.Socket.DisconnectAsync();
         session.Socket.ErrorReceived -= logReceivedError;
         session.Items.ItemReceived -= itemReceived;
@@ -105,9 +107,23 @@ public class APSession {
     public static void itemReceived(IReceivedItemsHelper helper) {
         ItemInfo item = helper.PeekItem();
         if (currentSave.receivedItems.Contains(item.ItemId)) {
-            helper.DequeueItem();
-            return;
+            if (currentSave.recievedMultiples.ContainsKey(item.ItemId)) {
+                if (!sessionRecievedMultiples.ContainsKey(item.ItemId)) {
+                    sessionRecievedMultiples[item.ItemId] = 0;
+                }
+                sessionRecievedMultiples[item.ItemId]++;
+
+                if (currentSave.recievedMultiples[item.ItemId] >= sessionRecievedMultiples[item.ItemId]) {
+                    helper.DequeueItem();
+                    return;
+                }
+            }
+            else {
+                helper.DequeueItem();
+                return;
+            }
         }
+
         VSRAP.logger.LogInfo($"Received {item.ItemDisplayName} from {item.Player.Alias} ({item.LocationDisplayName})");
         bool selfItem = item.Player.Slot == session.ConnectionInfo.Slot;
         CheckHandler.getItem(item.ItemId);

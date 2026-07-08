@@ -107,10 +107,10 @@ public class Data {
     };
 
     public static Dictionary<long, float> PHASE_REFILLS = new() {
-        [1] = 25f,
-        [2] = 50f,
-        [3] = 75f,
-        [4] = 100f,
+        [1] = 20f,
+        [2] = 40f,
+        [3] = 60f,
+        [4] = 80f,
     };
 
     public static Dictionary<(int, int), long> AMBUSH_LOCATIONS = new() {
