@@ -29,7 +29,7 @@ public class CheckHandler {
     }
 
     private static void sendCheck(long check) {
-        if (!APSession.currentSave.checkedLocations.Contains(check)) {
+        if (!APSession.currentSave.checkedLocations.Contains(check) && APSession.session.Locations.AllLocations.Contains(check)) {
             APSession.currentSave.checkedLocations.Add(check);
             // TODO make sure this doesnt die when we are disconnected
             APSession.session.Locations.CompleteLocationChecks(check);
@@ -42,6 +42,14 @@ public class CheckHandler {
             }
         }
     }
+
+    public static void externalCollectLocation(long id) {
+        // this is from a !collect or /send_location, the item has already been sent
+        APSession.currentSave.checkedLocations.Add(id);
+    }
+
+
+    // -- check sending patch targets --
 
     public static void collectDecryptor(Decryptor.ID decryptor) {
         if (!Data.DECRYPTOR_LOCATIONS.ContainsKey(decryptor)) {
@@ -58,6 +66,8 @@ public class CheckHandler {
         }
         sendCheck(Data.CARD_LOCATIONS[card]);
     }
+
+    // -- simple check sending patches --
 
     [HarmonyPatch(typeof(NodeData), nameof(NodeData.defeatAmbush), new Type[] { typeof(int), typeof(int) })]
     [HarmonyPostfix]
@@ -100,10 +110,7 @@ public class CheckHandler {
         sendCheck(Data.ORB_LOCATIONS[orb]);
     }
 
-    public static void externalCollectLocation(long id) {
-        // this is from a !collect or /send_location, the item has already been sent
-        APSession.currentSave.checkedLocations.Add(id);
-    }
+    // -- checked location redirection patch targets --
 
     public static bool decryptorChecked(Decryptor.ID decryptor) {
         return APSession.currentSave.checkedLocations.Contains(Data.DECRYPTOR_LOCATIONS[decryptor]);
@@ -113,8 +120,11 @@ public class CheckHandler {
         return APSession.currentSave.checkedLocations.Contains(Data.CARD_LOCATIONS[card]);
     }
 
+    // -- decryptor patches --
+
     [HarmonyPatch(typeof(DecryptorPickup), "OnTriggerEnter2D")]
     [HarmonyPatch(typeof(DecryptorPickup), "OnRevertExist")]
+    [HarmonyPatch(typeof(GlitchFight), "BossStart")]
     [HarmonyTranspiler]
     static IEnumerable<CodeInstruction> redirectToAPDecryptorChecked(IEnumerable<CodeInstruction> insns) {
         return new CodeMatcher(insns)
@@ -145,6 +155,46 @@ public class CheckHandler {
             .InstructionEnumeration();
     }
 
+    // -- glitch fight related decryptor patches --
+
+    public static void collectGlitchFightDecryptors() {
+        collectDecryptor(Decryptor.ID.VIRUS_WIPE);
+        collectDecryptor(Decryptor.ID.STRIP_SUIT);
+    }
+
+    public static bool shouldSkipSalesmanEncounter(Decryptor.ID canaryDecryptor) {
+        return decryptorChecked(canaryDecryptor) || !Vars.currentNodeData.eventHappened(AdventureEvent.Physical.GLITCH_DEFEAT_CUTSCENE_START);
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.enterShellSuit))]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> removeSpecialDecryptorCollection(IEnumerable<CodeInstruction> insns) {
+        return new CodeMatcher(insns)
+            .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Vars), nameof(Vars.collectDecryptor))))
+            .Repeat(match => match.SetOpcodeAndAdvance(OpCodes.Pop))
+            .InstructionEnumeration();
+    }
+
+    [HarmonyPatch(typeof(SalesmanWarehouseEncounterStart), "Start")]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> fixupStartConditions(IEnumerable<CodeInstruction> insns) {
+        return new CodeMatcher(insns)
+            .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Vars), nameof(Vars.abilityKnown))))
+            .SetOperandAndAdvance(AccessTools.Method(typeof(CheckHandler), nameof(CheckHandler.shouldSkipSalesmanEncounter)))
+            .InstructionEnumeration();
+    }
+
+    [HarmonyPatch(typeof(SalesmanWarehouseEncounterStart), "Update")]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> collectDecryptorsOnCutscene(IEnumerable<CodeInstruction> insns) {
+        return new CodeMatcher(insns)
+            .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ScriptRunner), nameof(ScriptRunner.runScript))))
+            .InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CheckHandler), nameof(CheckHandler.collectGlitchFightDecryptors))))
+            .InstructionEnumeration();
+    }
+
+    // -- creature card patches --
+
     [HarmonyPatch(typeof(CreatureCardPickup), "Start")]
     [HarmonyPatch(typeof(CreatureCardPickup), "OnRevert")]
     [HarmonyTranspiler]
@@ -171,5 +221,14 @@ public class CheckHandler {
             .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Vars), nameof(Vars.creatureCardFind), new Type[] { typeof(int) })))
             .SetInstructionAndAdvance(new CodeInstruction(OpCodes.Pop))
             .InstructionEnumeration();
+    }
+
+    // -- goal patches --
+
+    [HarmonyPatch(typeof(Salesman.Salesman), nameof(Salesman.Salesman.DefeatExamineEnd))]
+    [HarmonyPrefix]
+    static void completeGoal() {
+        Notifications.queueNotification("Completed the goal!");
+        APSession.session.SetGoalAchieved();
     }
 }

@@ -56,6 +56,7 @@ public class SaveDataPatches {
     }
 
     [HarmonyPatch(typeof(FileSelectScreen), "beginFile")]
+    [HarmonyPatch(typeof(FileSelectScreen), "beginNewFile")]
     [HarmonyTranspiler]
     static IEnumerable<CodeInstruction> patchFileLoadErrors(IEnumerable<CodeInstruction> insns, ILGenerator generator) {
         Label retLabel = generator.DefineLabel();

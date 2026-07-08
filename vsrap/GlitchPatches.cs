@@ -19,9 +19,11 @@ public class GlitchPatches {
     static bool disableMostGlitches(ref bool __result) {
         if (noGlitches) {
             __result = false;
-            return false;
         }
-        return true;
+        else {
+            __result = Player.instance != null && !Player.instance.exploded && !Player.instance.larvaMode && Vars.abilityKnown(Decryptor.ID.VIRUS);
+        }
+        return false;
     }
 
     [HarmonyPatch(typeof(GlitchEncounterTrigger), "OnTriggerStay2D")]
