@@ -16,6 +16,11 @@ public class APSession {
     public static Dictionary<long, int> sessionRecievedMultiples = new();
 
     public static void connect() {
+        if (SaveDataPatches.loadError != null) {
+            // something errored earlier in save loading so we shouldn't continue
+            return;
+        }
+
         if (session != null) {
             VSRAP.logger.LogWarning("Cleaning up existing AP session before setting up a new one.");
             cleanupSession();

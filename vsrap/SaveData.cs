@@ -56,24 +56,6 @@ public class SaveDataPatches {
             ).InstructionEnumeration();
     }
 
-    [HarmonyPatch(typeof(FileSelectScreen), "beginFile")]
-    [HarmonyPatch(typeof(FileSelectScreen), "beginNewFile")]
-    [HarmonyTranspiler]
-    static IEnumerable<CodeInstruction> patchFileLoadErrors(IEnumerable<CodeInstruction> insns, ILGenerator generator) {
-        Label retLabel = generator.DefineLabel();
-
-        return new CodeMatcher(insns)
-            .End()
-            .MatchBack(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(FileSelectScreen), "whiteScreenTransition")))
-            .Insert(
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SaveDataPatches), nameof(SaveDataPatches.handleLoadError))),
-                new CodeInstruction(OpCodes.Brfalse_S, retLabel),
-                new CodeInstruction(OpCodes.Ldarg_0)
-            ).MatchForward(false, new CodeMatch(OpCodes.Ret))
-            .AddLabels([retLabel])
-            .InstructionEnumeration();
-    }
-
     [HarmonyPatch(typeof(Vars), nameof(Vars.goToTitleScreen))]
     [HarmonyPostfix]
     static void patchReturnToTitle() {
@@ -85,12 +67,11 @@ public class SaveDataPatches {
     [HarmonyPostfix]
     static void patchNewFile() {
         APSaveData save = new();
-        // TODO unhardcode
-        save.connection.address = "localhost:38281";
-        save.connection.slot = "test";
+        save.connection.address = "archipelago.gg";
+        save.connection.port = 0;
+        save.connection.slot = "Oracle";
         save.connection.password = "";
         APSession.currentSave = save;
-        APSession.connect();
     }
 
     static StringBuilder addSaveData(StringBuilder builder) {
@@ -136,17 +117,15 @@ public class SaveDataPatches {
             .ToDictionary(s => long.Parse(s[0]), s => int.Parse(s[1]));
 
         APSession.currentSave = save;
-        APSession.connect();
     }
 
-    static bool handleLoadError(FileSelectScreen screen) {
+    public static bool handleLoadError(FileSelectScreen screen) {
         if (loadError != null) {
             screen.showError(loadError);
             loadError = null;
             return false;
         }
 
-        loadError = null;
         return true;
     }
 }
