@@ -14,6 +14,9 @@
     </RestoreAdditionalProjectSources>
     <RootNamespace>vsrap</RootNamespace>
     <DefaultItemExcludes>$(DefaultItemExcludes);templates/**</DefaultItemExcludes>
+    <!-- You will probably need to change these if you want to build the mod -->
+    <GameDllPath>$(HOME)/src/csharp/vsrap/lib</GameDllPath>
+    <SystemDllPath>/usr/lib/mono/4.5</SystemDllPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Archipelago.MultiClient.Net" Version="6.7.1"/>
@@ -22,7 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
-    <PackageReference Include="BepInEx.Core" Version="5.*"/>
+    <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all"/>
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*"/>
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.37" IncludeAssets="compile"/>
   </ItemGroup>
@@ -31,7 +34,25 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>$(HOME)/src/csharp/vsrap/lib/Assembly-CSharp.dll</HintPath>
+      <!-- why is false the value that excludes this from the build dir??? -->
+      <Private>false</Private>
+      <HintPath>$(GameDllPath)/Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <!-- VSR does not ship these system libs that AP.NET requires, so we need to include them ourselves -->
+    <Reference Include="System.Data">
+      <Private>true</Private>
+      <HintPath>$(SystemDllPath)/System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics">
+      <Private>true</Private>
+      <HintPath>$(SystemDllPath)/System.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <Private>true</Private>
+      <HintPath>$(SystemDllPath)/System.Runtime.Serialization.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Target Name="PackageMod" AfterTargets="Publish">
+    <ZipDirectory SourceDirectory="$(OutputPath)/publish" DestinationFile="$(MSBuildProjectDirectory)/../build/vsrap-$(Version).zip" Overwrite="true"/>
+  </Target>
 </Project>
