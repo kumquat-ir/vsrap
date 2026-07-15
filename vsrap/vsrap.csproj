@@ -52,7 +52,13 @@
       <HintPath>$(SystemDllPath)/System.Runtime.Serialization.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <OutputFiles Include="$(OutputPath)/publish/*.dll"/>
+  </ItemGroup>
   <Target Name="PackageMod" AfterTargets="Publish">
-    <ZipDirectory SourceDirectory="$(OutputPath)/publish" DestinationFile="$(MSBuildProjectDirectory)/../build/vsrap-$(Version).zip" Overwrite="true"/>
+    <MakeDir Directories="$(MSBuildProjectDirectory)/../build/temp/vsrap"/>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(MSBuildProjectDirectory)/../build/temp/vsrap"/>
+    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)/../build/temp" DestinationFile="$(MSBuildProjectDirectory)/../build/vsrap-$(Version).zip" Overwrite="true"/>
+    <RemoveDir Directories="$(MSBuildProjectDirectory)/../build/temp"/>
   </Target>
 </Project>

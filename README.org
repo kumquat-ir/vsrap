@@ -1,0 +1,9 @@
+#+title: VSR Archipelago Client
+
+To install:
+- Download [[https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5][BepInEx 5.x]] and [[https://docs.bepinex.dev/articles/user_guide/installation/index.html][install it]] in VSR's game folder.
+- Run the game once so BepInEx can finish setting itself up.
+- Download [[https://github.com/kumquat-ir/vsrap/releases/latest][the latest release of the mod]], and extract it into =BepInEx/plugins=.
+- If done correctly, the game will prompt you for connection details on starting a new file, and will not allow you to load a vanilla save file.
+
+You'll probably also want [[https://github.com/kumquat-ir/Archipelago/releases/latest][the APWorld]] and [[https://github.com/kumquat-ir/vsr-tracker/releases/latest][the Poptracker pack]].
