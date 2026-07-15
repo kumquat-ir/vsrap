@@ -9,12 +9,7 @@ public class Notifications {
     private static List<string> queue = new();
 
     public static void queueNotification(string notif) {
-        if (Notification.instance != null) {
-            Notification.instance.displayNotification(notif);
-        }
-        else {
-            queue.Add(notif);
-        }
+        queue.Add(notif);
     }
 
     public static void clearQueue() {
@@ -25,6 +20,15 @@ public class Notifications {
     [HarmonyPostfix]
     static void queuePendingNotifications() {
         Notification.instance.maxQueueSize = 9999;
+        foreach (string notif in queue) {
+            Notification.instance.displayNotification(notif);
+        }
+        clearQueue();
+    }
+
+    [HarmonyPatch(typeof(Notification), "Update")]
+    [HarmonyPostfix]
+    static void queueNotificationsSafely() {
         foreach (string notif in queue) {
             Notification.instance.displayNotification(notif);
         }
